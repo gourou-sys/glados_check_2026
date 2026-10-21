@@ -59,30 +59,40 @@ def checkin(cookie):
     state_url= "https://glados.space/api/user/status"
     referer = 'https://glados.space/console/checkin'
     origin = "https://glados.space"
-    useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36"
-    payload={
-        'token': 'glados.space'
+    useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+    payload = {'token': 'glados.space'}
+    headers = {
+        'cookie': cookie,
+        'referer': referer,
+        'origin': origin,
+        'user-agent': useragent,
+        'accept': 'application/json, text/plain, */*',
+        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'content-type': 'application/json;charset=UTF-8',
+        'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
     }
     try:
-        checkin = requests.post(checkin_url,headers={
-            'cookie': cookie ,
-            'referer': referer,
-            'origin':origin,
-            'user-agent':useragent,
-            'content-type':'application/json;charset=UTF-8'},data=json.dumps(payload))
-        state =  requests.get(state_url,headers={
-            'cookie': cookie ,
-            'referer': referer,
-            'origin':origin,
-            'user-agent':useragent})
+        checkin = requests.post(checkin_url, headers=headers,
+                                data=json.dumps(payload), timeout=30)
+        state = requests.get(state_url, headers=headers, timeout=30)
     except Exception as e:
         print(f"签到失败，请检查网络：{e}")
         return None, None, None
     
     try:
-        mess = checkin.json()['message']
-        mail = state.json()['data']['email']
-        time = state.json()['data']['leftDays'].split('.')[0]
+        result = checkin.json()
+        print(f"签到诊断: HTTP={checkin.status_code}, code={result.get('code')!r}, reason={result.get('reason')!r}")
+        print(f"设备诊断: loginDevice={result.get('loginDevice')!r}, currentDevice={result.get('currentDevice')!r}")
+        account = state.json()
+        print(f"状态诊断: HTTP={state.status_code}, code={account.get('code')!r}, reason={account.get('reason')!r}")
+        mess = result['message']
+        mail = account['data']['email']
+        time = account['data']['leftDays'].split('.')[0]
     except Exception as e:
         print(f"解析登录结果失败：{e}")
         return None, None, None
