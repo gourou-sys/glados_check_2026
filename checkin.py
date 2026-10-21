@@ -55,13 +55,13 @@ def load_send():
 
 # GlaDOS签到
 def checkin(cookie):
-    checkin_url= "https://glados.cloud/api/user/checkin"
-    state_url= "https://glados.cloud/api/user/status"
-    referer = 'https://glados.cloud/console/checkin'
-    origin = "https://glados.cloud"
+    checkin_url= "https://glados.space/api/user/checkin"
+    state_url= "https://glados.space/api/user/status"
+    referer = 'https://glados.space/console/checkin'
+    origin = "https://glados.space"
     useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36"
     payload={
-        'token': 'glados.cloud'
+        'token': 'glados.space'
     }
     try:
         checkin = requests.post(checkin_url,headers={
